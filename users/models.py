@@ -1,11 +1,16 @@
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db import models
-
-from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 from materials.models import Course, Lesson
 
 
+class UserRoles(models.TextChoices):
+    MEMBER = 'member', _('member')
+    MODERATOR = 'moderator', _('moderator')
+
+
 class User(AbstractUser):
+    username = models.CharField(max_length=15, blank=True)
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=15, blank=True)
     city = models.CharField(max_length=100, blank=True)
@@ -47,3 +52,13 @@ class Payment(models.Model):
 
     def __str__(self):
         return f"Payment: {self.user}, {self.payment_date}, {self.amount}"
+
+
+class Subscriptions(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='пользователь')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, verbose_name='курс')
+    status = models.BooleanField(default=True, verbose_name='Статус подписки')
+
+    class Meta:
+        verbose_name = "Подписка"
+        verbose_name_plural = "Подписки"

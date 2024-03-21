@@ -1,8 +1,9 @@
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 
-from users.models import User, Payment
+from users.models import User, Payment, Subscriptions
 from .models import Course, Lesson
+from .validators import UrlValidator
 
 
 class CourseSerializer(serializers.ModelSerializer):
@@ -22,6 +23,7 @@ class LessonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lesson
         fields = '__all__'
+        validators = [UrlValidator(field='url_video')]
 
 
 class LessonListSerializer(serializers.ModelSerializer):
@@ -44,3 +46,44 @@ class PaymentsForOwnerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
         fields = ['id', 'amount', 'payment_date', 'payment_method']
+
+
+class SubscriptionCourseSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = Subscriptions
+        fields = "__all__"
+
+
+class CourseSerializers(serializers.ModelSerializer):
+    all_lessons = LessonSerializer(many=True, read_only=True, source='lesson_set')
+    number_of_lesson = serializers.SerializerMethodField()
+    sub_status = serializers.SerializerMethodField()
+
+    def get_sub_status(self, instance):
+        user = self.context['request'].user.id
+        obj = Subscriptions.objects.filter(course=instance).filter(user=user)
+        if obj:
+            return obj.first().status
+        return False
+
+    def get_number_of_lesson(self, course):
+        lesson = Lesson.objects.filter(course=course)
+        if lesson:
+            return lesson.count()
+        return 0
+
+    class Meta:
+        model = Course
+        fields = ('id', 'name', 'preview', 'description', 'all_lessons', 'number_of_lesson', 'sub_status', 'updated_at')
+
+
+class PaymentsSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = Payment
+        fields = "__all__"
+
+
+class PaymentCreateSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = Payment
+        fields = ("course",)
