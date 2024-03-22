@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-9#osl%!5e$$$f4n8b07cg4i-d^px5#&wnk=yf+t&2p__=z5@4y
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -181,8 +181,9 @@ CELERY_BEAT_SCHEDULE = {
     }
 }
 
-EMAIL_HOST = 'smtp.yandex.ru'
-EMAIL_PORT = 465
-EMAIL_HOST_USER = 'AisShakh@yandex.ru'
-EMAIL_HOST_PASSWORD = 'qrwtvhbipvgvzcyh'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 EMAIL_USE_SSL = True
+
