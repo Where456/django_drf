@@ -9,8 +9,14 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
-
+import os
 from pathlib import Path
+
+import stripe
+from celery.schedules import crontab
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -36,9 +42,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'drf_yasg',
+
     'users',
     'materials',
+
     'rest_framework',
+    'rest_framework_simplejwt',
+    'django_celery_beat',
 
 ]
 
@@ -107,7 +118,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-ru'
 
 TIME_ZONE = 'UTC'
 
@@ -125,3 +136,53 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODAL = 'users.User'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
+}
+
+stripe.api_key = os.getenv("TOKEN")
+
+CORS_ALLOWED_ORIGINS = [
+    "https://read-only.example.com",
+    "https://read-and-write.example.com",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://read-and-write.example.com",
+]
+CORS_ALLOW_ALL_ORIGINS = False
+
+# Settings for Celery
+# URL-адрес брокера сообщений
+CELERY_BROKER_URL = 'redis://redis:6379/0'
+# URL-адрес брокера результатов
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+# Часовой пояс для работы Celery
+CELERY_TIMEZONE = "Europe/Moscow"
+# Флаг отслеживания выполнения задач
+CELERY_TASK_TRACK_STARTED = True
+# Максимальное время на выполнение задачи
+CELERY_TASK_TIME_LIMIT = 30 * 60
+
+CELERY_BEAT_SCHEDULE = {
+    'check': {
+        'task': 'study.tasks.check',
+        'schedule': crontab(minute='50', hour='23'),
+    },
+    'last_login': {
+        'task': 'study.tasks.last_login_user',
+        'schedule': crontab(minute='0', hour='0'),
+    }
+}
+
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = 'AisShakh@yandex.ru'
+EMAIL_HOST_PASSWORD = 'qrwtvhbipvgvzcyh'
+EMAIL_USE_SSL = True

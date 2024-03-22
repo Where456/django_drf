@@ -3,7 +3,7 @@ from rest_framework import routers
 
 from materials.views import CourseViewSet, LessonListCreateAPIView, LessonRetrieveUpdateDestroyAPIView, \
     LessonListAPIView, LessonCreateAPIView, LessonUpdateAPIView, LessonRetrieveAPIView, LessonDestroyAPIView, \
-    PaymentListAPIView, SubscriptionDestroyAPIView, SubscriptionCreateAPIView
+    PaymentListAPIView, SubscriptionDestroyAPIView, SubscriptionCreateAPIView, PaymentCreateView
 from users.views import UserViewSet
 
 router = routers.DefaultRouter()
@@ -25,5 +25,6 @@ urlpatterns = [
     path('subscription_destroy/<int:pk>/', SubscriptionDestroyAPIView.as_view(), name='subscription_destroy'),
 
     path('payments/', PaymentListAPIView.as_view(), name='payments-list'),
+    path('create/', PaymentCreateView.as_view(), name='payment_create'),
 ]
 

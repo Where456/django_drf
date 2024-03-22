@@ -9,6 +9,7 @@ from users.models import Payment, Subscriptions
 from .models import Course, Lesson
 from .serializers import CourseSerializer, LessonSerializer, PaymentSerializer, PaymentCreateSerializers, \
     SubscriptionCourseSerializers
+from .services import get_pay
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -64,12 +65,22 @@ class PaymentCreateView(generics.CreateAPIView):
     queryset = Payment.objects.all()
     permission_classes = [IsAuthenticated]
 
-    def post(self, request, *args, **kwargs):
+    def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        course = serializer.validated_data['course']
+
+        amount_payment = serializer.validated_data.get('amount')
+        method_payment = serializer.validated_data.get('payment_method_choices')
+
         user = self.request.user
-        return Response({'course_id': course.id}, status=status.HTTP_201_CREATED)
+        payment = get_pay(amount_payment, user)
+        response_data = {
+            "id": payment.id,
+            "amount": payment.amount_payment,
+            "payment_method_choices": method_payment,
+            "stripe_id": payment.stripe_id
+        }
+        return Response(response_data)
 
 
 class SubscriptionCreateAPIView(generics.CreateAPIView):

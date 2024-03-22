@@ -49,6 +49,7 @@ class Payment(models.Model):
         ('transfer', 'Перевод на счет'),
     ]
     payment_method = models.CharField(max_length=10, choices=payment_method_choices)
+    stripe_id = models.CharField(max_length=300, verbose_name='stripe_id', blank=True, null=True)
 
     def __str__(self):
         return f"Payment: {self.user}, {self.payment_date}, {self.amount}"
@@ -57,7 +58,7 @@ class Payment(models.Model):
 class Subscriptions(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='пользователь')
     course = models.ForeignKey(Course, on_delete=models.CASCADE, verbose_name='курс')
-    status = models.BooleanField(default=True, verbose_name='Статус подписки')
+    status = models.BooleanField(default=True, verbose_name='cтатус подписки')
 
     class Meta:
         verbose_name = "Подписка"
