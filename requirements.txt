@@ -19,6 +19,7 @@ django-timezone-field==6.1.0
 djangorestframework==3.14.0
 djangorestframework-simplejwt==5.3.1
 drf-yasg==1.21.7
+gunicorn==20.1.0
 idna==3.6
 inflection==0.5.1
 kombu==5.3.5
@@ -27,13 +28,14 @@ packaging==24.0
 pillow==10.2.0
 prompt-toolkit==3.0.43
 psycopg==3.1.18
-psycopg2==2.9.9
+psycopg2-binary==2.9.9
 PyJWT==2.8.0
 python-crontab==3.0.0
 python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
 pytz==2024.1
 PyYAML==6.0.1
+redis==4.1.4
 requests==2.31.0
 rest-framework-simplejwt==0.0.2
 six==1.16.0
