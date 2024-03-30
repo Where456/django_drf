@@ -4,20 +4,22 @@ services:
   redis:
     image: redis
     ports:
-      - '6379:6379'
+      - '${REDIS_PORT}:6379'
 
   postgreSQL:
     image: postgres:latest
     environment:
-      - POSTGRES_PASSWORD=19290
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
       - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
-      - pg_data:/var/lib/postgresql/data/pgdata
-    container_name: postgreSQL
+      - pg_data:/var/lib/postgresql/data
+    container_name: ${POSTGRES_HOST}
     ports:
-      - '5404:5432'
+      - '5404:${POSTGRES_PORT}'
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -31,8 +33,7 @@ services:
     ports:
       - '8000:8000'
     depends_on:
-      postgreSQL:
-        condition: service_healthy
+      - postgreSQL
 
   celery:
     build: .
@@ -44,7 +45,6 @@ services:
 
   celery_beat:
     build: .
-#    restart: always
     tty: true
     command: celery -A config beat -l INFO -S django
     depends_on:

@@ -85,17 +85,17 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres_drf_2',
-        'USER': 'postgres',
-        'HOST': '127.0.0.1',
-        'PORT': 5432,
-        'PASSWORD': 'Daana777'
+        'NAME': os.getenv('POSTGRES_DB'),  # Должно быть postgres_drf_2
+        'USER': os.getenv('POSTGRES_USER'),  # custom_user
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+        'HOST': os.getenv('POSTGRES_HOST'),  # postgreSQL
+        'PORT': os.getenv('POSTGRES_PORT'),  # 5432
     }
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -146,7 +146,7 @@ REST_FRAMEWORK = {
     ]
 }
 
-stripe.api_key = os.getenv("TOKEN")
+stripe.api_key = os.getenv("STRIPE_API_KEY")
 
 CORS_ALLOWED_ORIGINS = [
     "https://read-only.example.com",
@@ -160,9 +160,8 @@ CORS_ALLOW_ALL_ORIGINS = False
 
 # Settings for Celery
 # URL-адрес брокера сообщений
-CELERY_BROKER_URL = 'redis://redis:6379/0'
-# URL-адрес брокера результатов
-CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_BROKER_URL = f'redis://{os.getenv("REDIS_HOST")}:{os.getenv("REDIS_PORT")}/0'
+CELERY_RESULT_BACKEND = f'redis://{os.getenv("REDIS_HOST")}:{os.getenv("REDIS_PORT")}/0'
 # Часовой пояс для работы Celery
 CELERY_TIMEZONE = "Europe/Moscow"
 # Флаг отслеживания выполнения задач
